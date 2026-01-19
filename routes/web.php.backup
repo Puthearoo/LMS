@@ -1,0 +1,56 @@
+<?php
+
+// use App\Http\Controllers\BookController;
+// use App\Http\Controllers\CheckoutController;
+// use App\Http\Controllers\ReservationController;
+// use App\Http\Controllers\FineController;
+// use App\Http\Controllers\UserController;
+// use App\Http\Controllers\HomeController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+Auth::routes();
+
+// Test route
+Route::get('/', function () {
+    return "LARAVEL WORKS! " . date('Y-m-d H:i:s');
+});
+
+// Test home route
+Route::get('/home', function () {
+    return "HOME PAGE WORKS!";
+});
+
+?>
+
+// // Books Routes
+// Route::resource('books', BookController::class);
+// Route::post('/books/{book}/checkout', [BookController::class, 'checkout'])->name('books.checkout');
+// Route::post('/books/{book}/reserve', [BookController::class, 'reserve'])->name('books.reserve');
+// Route::get('/books/{book}/availability', [BookController::class, 'checkAvailability'])->name('books.availability');
+
+// // Checkouts Routes
+// Route::resource('checkouts', CheckoutController::class);
+// Route::post('/checkouts/{checkout}/return', [CheckoutController::class, 'returnBook'])->name('checkouts.return');
+// Route::get('/checkouts/user/{user}', [CheckoutController::class, 'getUserCheckouts'])->name('checkouts.user');
+
+// // Reservations Routes
+// Route::resource('reservations', ReservationController::class);
+// Route::post('/reservations/{reservation}/cancel', [ReservationController::class,
+'cancelReservation'])->name('reservations.cancel');
+// Route::get('/reservations/user/{user}', [ReservationController::class,
+'getUserReservations'])->name('reservations.user');
+
+// // Fines Routes
+// Route::resource('fines', FineController::class);
+// Route::post('/fines/{fine}/pay', [FineController::class, 'payFine'])->name('fines.pay');
+// Route::get('/fines/user/{user}', [FineController::class, 'getUserFines'])->name('fines.user');
+
+// // Users Routes
+// // Route::resource('users', UserController::class)->except(['create', 'store']);
+
+// // Dashboard Route
+// Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
+// Route::get('/home', [HomeController::class, 'index'])->name('home');
+// Auth::routes();
+
+// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
