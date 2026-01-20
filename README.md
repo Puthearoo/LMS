@@ -38,6 +38,30 @@ and reserve books, while providing librarians with full administrative control.
 - PHP / Laravel
 - MySQL Database
 
+### Login Page
+
+![Login Page](screenshots/login.png)
+
+### Book List
+
+![Book List](screenshots/book-list.png)
+
+### Checkout List
+
+![Checkout List](screenshots/checkout-list.png)
+
+### Reservation List
+
+![Reservation List](screenshots/reservation-list.png)
+
+### User List
+
+![User List](screenshots/user-list.png)
+
+### Fine List (Unpaid Fines)
+
+![Fine List](screenshots/fine-list.png)
+
 ## System Roles
 
 - **User:** View borrowed, currently checked-out, and reserved books; borrow and return books; extend checkout periods; and make reservations
