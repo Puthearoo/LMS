@@ -30,7 +30,7 @@ class Checkout extends Model
         'extended_due_date' => 'date',
         'extension_requested' => 'boolean',
     ];
-
+    // Relationships
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -45,14 +45,16 @@ class Checkout extends Model
     {
         return $this->hasMany(Fine::class);
     }
-    public function hasUnpaidFine()
-    {
-        return $this->fines()->where('status', 'unpaid')->exists();
-    }
     public function reservation()
     {
         return $this->belongsTo(Reservation::class, 'reservation_id');
     }
+    // Check Unpaid Fine
+    public function hasUnpaidFine()
+    {
+        return $this->fines()->where('status', 'unpaid')->exists();
+    }
+
     // Check if checkout is overdue
     public function isOverdue()
     {
@@ -102,7 +104,7 @@ class Checkout extends Model
             $this->extended_due_date !== null;
     }
 
-    // Approve extension - REMOVED extended_at
+    // Approve extension
     public function approveExtension($days = 3)
     {
         $newDueDate = $this->due_date->copy()->addDays($days);
@@ -112,7 +114,6 @@ class Checkout extends Model
             'extension_status' => 'approved',
             'extension_days' => $days,
             'extended_due_date' => $newDueDate,
-            // REMOVED: 'extended_at' => now(),
             'due_date' => $newDueDate,
         ]);
 
@@ -143,6 +144,7 @@ class Checkout extends Model
             'extension_requested_at' => now(),
         ]);
     }
+    // SHow extension button 
     public function canShowExtendButton(): bool
     {
         return $this->canRequestExtension()
@@ -285,7 +287,7 @@ class Checkout extends Model
         return $this->due_date;
     }
 
-    // Validation rules - UPDATED to include 'cancelled'
+    // Validation rules 
     public static function validationRules($forCreate = true)
     {
         $rules = [

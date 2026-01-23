@@ -55,7 +55,7 @@ class Fine extends Model
             'paid_date' => Carbon::now()
         ]);
     }
-
+    // Waive function
     public function waive()
     {
         $this->update([
@@ -64,7 +64,7 @@ class Fine extends Model
         ]);
     }
 
-    // In App\Models\Fine.php - FIX THE calculateOverdueFine() method
+    // Calculate Overdue Fine
     public static function calculateOverdueFine(Checkout $checkout)
     {
         if (!$checkout->due_date || $checkout->return_date) {
@@ -86,9 +86,8 @@ class Fine extends Model
             return 0;
         }
 
-        // CORRECT CALCULATION: Get days overdue
         // When today is AFTER due date, this gives positive number of days
-        $daysOverdue = $dueDate->diffInDays($today); // Changed this line!
+        $daysOverdue = $dueDate->diffInDays($today);
 
         \Log::info("Days overdue: {$daysOverdue}");
 
@@ -110,7 +109,7 @@ class Fine extends Model
         return round($fineAmount, 2);
     }
 
-    // FIXED: Create fine with $0.50 per day calculation
+    // Create fine with $0.50 per day calculation
     public static function createOverdueFine(Checkout $checkout)
     {
         // Check if there's already an unpaid fine for this checkout

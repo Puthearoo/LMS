@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use \Carbon\Carbon;
 use App\Models\Book;
 use App\Models\Checkout;
+use App\Models\Reservation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CheckoutController extends Controller
 {
@@ -39,7 +40,7 @@ class CheckoutController extends Controller
         return view('checkouts.my-checkouts', compact('checkouts'));
     }
 
-    // STUDENT: View BORROWING HISTORY (completed transactions)
+    // STUDENT: View BORROWING HISTORY 
     public function borrowingHistory(Request $request)
     {
         if (!Auth::check()) {
@@ -139,7 +140,7 @@ class CheckoutController extends Controller
             return back()->with('error', $statusMessage);
         }
 
-        // REAL LIBRARY LOGIC: Count only books actually checked out or approved (waiting)
+        // Count only books actually checked out or approved (waiting)
         $userActiveCheckouts = Checkout::where('user_id', Auth::id())
             ->whereIn('status', ['checked_out', 'approved'])  // Only books with user or waiting at desk
             ->count();
@@ -262,7 +263,7 @@ class CheckoutController extends Controller
             return back()->with('error', 'Book is no longer available.');
         }
 
-        // REAL LIBRARY LOGIC: Check if user is at limit before approving
+        // Check if user is at limit before approving
         $userActiveCheckouts = Checkout::where('user_id', $checkout->user_id)
             ->whereIn('status', ['checked_out', 'approved'])
             ->count();
@@ -281,7 +282,7 @@ class CheckoutController extends Controller
             $checkout->update([
                 'status' => 'approved',
                 'checkout_date' => now(),
-                'due_date' => now()->addDays(14) // Set to 14 days
+                'due_date' => now()->addDays(14) // Set to 14 days as defaults
             ]);
 
             // Update book availability to checked_out
@@ -383,7 +384,7 @@ class CheckoutController extends Controller
             ]);
 
             // Check if there are any waiting reservations for this book
-            $waitingReservations = \App\Models\Reservation::where('book_id', $checkout->book_id)
+            $waitingReservations = Reservation::where('book_id', $checkout->book_id)
                 ->where('status', 'waiting')
                 ->exists();
 
@@ -476,7 +477,7 @@ class CheckoutController extends Controller
 
             // Calculate new due date
             $extensionDays = $checkout->extension_days ?? 3;
-            $newDueDate = \Carbon\Carbon::parse($checkout->due_date)->addDays($extensionDays);
+            $newDueDate = Carbon::parse($checkout->due_date)->addDays($extensionDays);
 
             // Update the checkout
             $checkout->update([
@@ -490,7 +491,7 @@ class CheckoutController extends Controller
             // Update all pending reservations for this book
             $this->updateReservationDates($checkout);
 
-            // Optional: Log the extension approval
+            // Log the extension approval
             Log::info("Extension approved for checkout {$checkout->id}. Book: {$checkout->book->title}, Original due: {$originalDueDate}, New due: {$newDueDate}");
 
             return redirect()->route('librarian.checkouts.pending-extensions')
@@ -503,12 +504,12 @@ class CheckoutController extends Controller
         }
     }
 
-    // NEW: Add this method to update reservation dates
+    // Update reservation dates
     private function updateReservationDates(Checkout $checkout)
     {
         try {
             // Get all waiting reservations for this book
-            $reservations = \App\Models\Reservation::where('book_id', $checkout->book_id)
+            $reservations = Reservation::where('book_id', $checkout->book_id)
                 ->where('status', 'waiting')
                 ->get();
 
@@ -541,7 +542,7 @@ class CheckoutController extends Controller
         }
     }
 
-    // NEW: Method to notify users about reservation date changes
+    // Notify users about reservation date changes (*Not worked yet)
     private function notifyReservationDateChange($reservation, $oldDate, $newDate)
     {
         try {
@@ -615,8 +616,7 @@ class CheckoutController extends Controller
 
             // Store the original due date for comparison
             $originalDueDate = $checkout->due_date;
-
-            // Extend by 3 days (you can make this configurable if needed)
+            // Extend 3 day
             $extensionDays = 3;
             $newDueDate = Carbon::parse($checkout->due_date)->addDays($extensionDays);
 
@@ -625,7 +625,7 @@ class CheckoutController extends Controller
                 'due_date' => $newDueDate,
                 'extended_due_date' => $newDueDate,
                 'extension_requested' => false,
-                'extension_status' => 'approved', // Mark as approved since librarian is doing it directly
+                'extension_status' => 'approved',
                 'updated_at' => now()
             ]);
 
@@ -694,7 +694,7 @@ class CheckoutController extends Controller
                 return back()->with('error', 'This user already has this book checked out or pending.');
             }
 
-            // REAL LIBRARY LOGIC: Count only checked_out or approved books
+            // Count only checked_out or approved books
             $userActiveCheckouts = Checkout::where('user_id', $request->user_id)
                 ->whereIn('status', ['checked_out', 'approved'])
                 ->count();
@@ -731,7 +731,7 @@ class CheckoutController extends Controller
         }
     }
 
-    // LIBRARIAN: Force return a book (admin override)
+    // LIBRARIAN: Force return a book 
     public function librarianReturnBook(Checkout $checkout)
     {
         if (!in_array(Auth::user()->role, ['librarian', 'admin'])) {
@@ -747,7 +747,7 @@ class CheckoutController extends Controller
             ]);
 
             // Check if there are any waiting reservations for this book
-            $waitingReservations = \App\Models\Reservation::where('book_id', $checkout->book_id)
+            $waitingReservations = Reservation::where('book_id', $checkout->book_id)
                 ->where('status', 'waiting')
                 ->exists();
 
@@ -886,7 +886,7 @@ class CheckoutController extends Controller
                 $checkout->return_date = now();
 
                 // Check if there are waiting reservations
-                $waitingReservations = \App\Models\Reservation::where('book_id', $checkout->book_id)
+                $waitingReservations = Reservation::where('book_id', $checkout->book_id)
                     ->where('status', 'waiting')
                     ->exists();
 

@@ -326,7 +326,7 @@ class ReservationController extends Controller
                 'availability_status' => 'reserved'
             ]);
 
-            // ✅ SEND BOOK AVAILABLE NOTIFICATION TO USER
+            // SEND BOOK AVAILABLE NOTIFICATION TO USER - (*not work)
             try {
                 $reservation->user->notify(new BookAvailableNotification(
                     $reservation,
@@ -477,7 +477,7 @@ class ReservationController extends Controller
                     'availability_status' => 'reserved'
                 ]);
 
-                // ✅ NOTIFY NEXT USER THAT BOOK IS AVAILABLE
+                // NOTIFY NEXT USER THAT BOOK IS AVAILABLE *Not work
                 try {
                     $nextReservation->user->notify(new BookAvailableNotification(
                         $nextReservation,
@@ -555,8 +555,8 @@ class ReservationController extends Controller
                 try {
                     $user->notify(new ReservationDateUpdated(
                         $reservation,
-                        $oldDateFormatted,  // Pass formatted string
-                        $newDateFormatted   // Pass formatted string
+                        $oldDateFormatted,
+                        $newDateFormatted
                     ));
                 } catch (\Exception $e) {
                     Log::error('Failed to send date update notification: ' . $e->getMessage());

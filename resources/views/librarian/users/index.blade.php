@@ -19,14 +19,6 @@
                 <p class="text-muted mb-0 d-none d-md-block">Track students with active loans, reservations, and fines</p>
                 <p class="text-muted mb-0 d-block d-md-none">Manage student borrowers</p>
             </div>
-            <div>
-                <button class="btn btn-outline-secondary btn-sm d-md-none" onclick="window.print()">
-                    <i class="fas fa-print"></i>
-                </button>
-                <button class="btn btn-outline-secondary d-none d-md-inline-flex align-items-center justify-content-center" onclick="window.print()">
-                    <i class="fas fa-print me-1"></i> Export
-                </button>
-            </div>
         </div>
     </div>
 

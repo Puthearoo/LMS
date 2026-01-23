@@ -26,7 +26,7 @@ class Reservation extends Model
         'reservation_date' => 'datetime',
         'expiry_date' => 'date',
     ];
-
+    // Relationships
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -37,7 +37,7 @@ class Reservation extends Model
         return $this->belongsTo(Book::class);
     }
 
-    // Scopes for different statuses - ADD THE PENDING SCOPE
+    // Scopes for different statuses 
     public function scopePending($query)
     {
         return $query->where('status', 'waiting');
@@ -107,6 +107,7 @@ class Reservation extends Model
         }
         return null;
     }
+    // Get cancelled by user
     public function getCancelledByUser()
     {
         if ($this->isCancelled()) {
@@ -115,6 +116,7 @@ class Reservation extends Model
         }
         return null;
     }
+    // Check if reservation expired
     public function isExpired()
     {
         if ($this->status === 'expired') {
@@ -129,7 +131,7 @@ class Reservation extends Model
 
         return false;
     }
-
+    // Check if reservation active
     public function isActive()
     {
         if (!in_array($this->status, ['waiting', 'ready'])) {
@@ -158,7 +160,7 @@ class Reservation extends Model
             ->orderBy('created_at', 'desc')
             ->first();
     }
-    // In your Reservation model
+    // Check if the reservation can be Ready
     public function canBeMarkedAsReady()
     {
         // Check if book is available OR reserved (but maybe the reservation expired)
@@ -305,14 +307,15 @@ class Reservation extends Model
             return '';
         }
 
-        // Get due date (considering extensions)
         $dueDate = Carbon::parse(
             $currentCheckout->extension_status === 'approved' && $currentCheckout->extended_due_date
             ? $currentCheckout->extended_due_date
             : $currentCheckout->due_date
         );
 
-        $daysDifference = $this->expiry_date->diffInDays($dueDate, false);
+        $expiryDate = Carbon::parse($this->expiry_date);
+
+        $daysDifference = $expiryDate->diffInDays($dueDate, false);
 
         if ($daysDifference == 0) {
             return 'Pickup deadline matches book due date';

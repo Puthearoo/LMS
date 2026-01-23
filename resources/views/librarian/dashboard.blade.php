@@ -304,94 +304,89 @@
     </div>
 
     <!-- Overdue Books -->
-    <div class="col-xl-6 col-lg-12">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white border-0 d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center py-3">
-                <div>
-                    <h5 class="mb-0 fw-bold">Overdue Books</h5>
-                    <small class="text-muted">Preview ({{ $pendingReturns->count() }} shown)</small>
-                </div>
-                <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0">
-                    <!-- Generate Fines Button -->
-                    <form action="{{ route('librarian.fines.generate-overdue') }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-danger btn-sm" 
-                                title="Generate Overdue Fines"
-                                onclick="return confirm('Generate fines for all overdue books?')">
-                            <i class="bi bi-lightning-charge-fill me-1"></i> Generate
-                        </button>
-                    </form>
-                    <a href="{{ route('librarian.fines.index') }}" class="btn btn-sm btn-outline-primary">
-                        View All ({{ $stats['pending_returns'] }}) →
-                    </a>
-                </div>
+<div class="col-xl-6 col-lg-12">
+    <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-0 d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center py-3">
+            <div>
+                <h5 class="mb-0 fw-bold">Overdue Books</h5>
+                <small class="text-muted">Showing {{ $pendingReturns->count() }} of {{ $stats['pending_returns'] }} overdue books</small>
             </div>
-            <div class="card-body p-0">
-                @if($pendingReturns && $pendingReturns->count() > 0)
-                    <div class="list-group list-group-flush">
-                        @foreach($pendingReturns as $checkout)
-                        @php
-                            // Use your model's daysOverdue() method for accurate calculation
-                            $daysOverdue = $checkout->daysOverdue();
-                            $fineAmount = $daysOverdue * 0.50;
-                            $urgency = $daysOverdue > 14 ? 'high' : ($daysOverdue > 7 ? 'medium' : 'low');
-                        @endphp
-                        <div class="list-group-item border-0 px-3 py-3">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <div class="urgency-indicator urgency-{{ $urgency }} rounded-circle me-3"></div>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center">
+            <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0">
+                <!-- Generate Fines Button -->
+                <form action="{{ route('librarian.fines.generate-overdue') }}" method="POST" class="d-inline">
+                    @csrf
+                    <button type="submit" class="btn btn-danger btn-sm" 
+                            title="Generate Overdue Fines"
+                            onclick="return confirm('Generate fines for all overdue books?')">
+                        <i class="bi bi-lightning-charge-fill me-1"></i> Generate Fines
+                    </button>
+                </form>
+                <a href="{{ route('librarian.checkouts.index', ['status' => 'overdue']) }}" class="btn btn-sm btn-outline-primary">
+                    View All ({{ $stats['pending_returns'] }}) →
+                </a>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            @if($pendingReturns && $pendingReturns->count() > 0)
+                <div class="list-group list-group-flush">
+                    @foreach($pendingReturns as $checkout)
+                    <div class="list-group-item border-0 px-3 py-3">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="urgency-indicator urgency-{{ $checkout->urgency }} rounded-circle me-3"></div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center">
+                                    <div>
+                                        <h6 class="fw-bold mb-1">{{ Str::limit($checkout->book->title, 35) }}</h6>
+                                        <p class="small text-muted mb-0">
+                                            <i class="bi bi-person me-1"></i>{{ $checkout->user->name }}
+                                            <span class="mx-1 d-none d-sm-inline">•</span>
+                                            <br class="d-sm-none">
+                                            <i class="bi bi-calendar-x me-1"></i>Due: {{ $checkout->due_date->format('M d, Y') }}
+                                        </p>
+                                    </div>
+                                    <div class="text-sm-end mt-2 mt-sm-0">
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle d-block d-sm-inline-block mb-1 mb-sm-0">
+                                            {{ $checkout->daysOverdue }} day{{ $checkout->daysOverdue != 1 ? 's' : '' }}
+                                        </span>
                                         <div>
-                                            <h6 class="fw-bold mb-1">{{ Str::limit($checkout->book->title, 35) }}</h6>
-                                            <p class="small text-muted mb-0">
-                                                <i class="bi bi-person me-1"></i>{{ $checkout->user->name }}
-                                                <span class="mx-1 d-none d-sm-inline">•</span>
-                                                <br class="d-sm-none">
-                                                <i class="bi bi-calendar-x me-1"></i>Due: {{ $checkout->due_date->format('M d, Y') }}
-                                            </p>
+                                            <small class="text-warning fw-bold">
+                                                <i class="bi bi-cash-coin me-1"></i>${{ number_format($checkout->fineAmount, 2) }}
+                                            </small>
                                         </div>
-                                        <div class="text-sm-end mt-2 mt-sm-0">
-                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle d-block d-sm-inline-block mb-1 mb-sm-0">
-                                                {{ $daysOverdue }} day{{ $daysOverdue != 1 ? 's' : '' }}
-                                            </span>
-                                            <div>
-                                                <small class="text-warning fw-bold">
-                                                    <i class="bi bi-cash-coin me-1"></i>${{ number_format($fineAmount, 2) }}
+                                        <!-- Check if fine already exists -->
+                                        @if($checkout->hasUnpaidFine())
+                                            <div class="mt-1">
+                                                <small class="text-danger">
+                                                    <i class="bi bi-exclamation-circle me-1"></i> Fine pending
                                                 </small>
                                             </div>
-                                            <!-- Check if fine already exists -->
-                                            @if($checkout->hasUnpaidFine())
-                                                <div class="mt-1">
-                                                    <small class="text-danger">
-                                                        <i class="bi bi-exclamation-circle me-1"></i> Fine pending
-                                                    </small>
-                                                </div>
-                                            @endif
-                                        </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        @endforeach
                     </div>
-                    @if($stats['pending_returns'] > 5)
-                    <div class="text-center py-2 border-top">
-                        <small class="text-muted">
-                            Showing 5 most overdue • <a href="{{ route('librarian.fines.index') }}" class="text-decoration-none">View all {{ $stats['pending_returns'] }} overdue</a>
-                        </small>
-                    </div>
-                    @endif
-                @else
-                    <div class="text-center py-5">
-                        <i class="bi bi-check-circle display-4 text-success opacity-25"></i>
-                        <p class="mt-3 text-success">No overdue books! Great job!</p>
-                    </div>
+                    @endforeach
+                </div>
+                
+                @if($stats['pending_returns'] > 5)
+                <div class="text-center py-2 border-top">
+                    <small class="text-muted">
+                        Showing 5 most overdue • <a href="{{ route('librarian.checkouts.index', ['status' => 'overdue']) }}" class="text-decoration-none">View all {{ $stats['pending_returns'] }} overdue books</a>
+                    </small>
+                </div>
                 @endif
-            </div>
+            @else
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle display-4 text-success opacity-25"></i>
+                    <p class="mt-3 text-success">No overdue books! Great job!</p>
+                </div>
+            @endif
         </div>
     </div>
+</div>
 </div>
 
 <!-- Bottom Section -->

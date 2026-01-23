@@ -180,14 +180,14 @@ class FineController extends Controller
             if ($fineAmount > 0) {
                 \Log::info("Creating fine: $" . $fineAmount);
 
-                // Create the fine with simple reason - FIX THIS LINE
+                // Create the fine with simple reason 
                 $fine = Fine::create([
                     'user_id' => $checkout->user_id,
                     'checkout_id' => $checkout->id,
                     'amount' => $fineAmount,
                     'fine_date' => now(),
                     'status' => 'unpaid',
-                    'reason' => \App\Models\Fine::REASON_OVERDUE, // Use the constant here!
+                    'reason' => Fine::REASON_OVERDUE,
                 ]);
 
                 $created++;

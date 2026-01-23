@@ -87,7 +87,6 @@ class BookController extends Controller
             ->with('success', 'Book added successfully!');
     }
 
-
     /**
      * Display the specified resource.
      */
@@ -140,9 +139,6 @@ class BookController extends Controller
             ->route('librarian.books.index')
             ->with('success', 'Book updated successfully!');
     }
-
-
-
     /**
      * Remove the specified resource from storage.
      */
@@ -158,8 +154,6 @@ class BookController extends Controller
             ->route('librarian.books.index')
             ->with('success', 'Book deleted successfully!');
     }
-
-
     // Additional methods from your routes
     public function checkout(Book $book)
     {

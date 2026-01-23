@@ -6,7 +6,7 @@ use App\Models\Checkout;
 use App\Models\Fine;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash; // Keep for other Hash methods if needed
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -17,7 +17,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $query = User::query()
-            ->where('role', 'student') // Librarians care about borrowers
+            ->where('role', 'student')
             ->withCount([
                 // Active loans
                 'checkouts as active_loans_count' => function ($q) {
@@ -43,7 +43,7 @@ class UserController extends Controller
                 }
             ], 'amount');
 
-        /* 🔍 Filters */
+        /* Filters */
         // User account status (active / blocked)
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -74,7 +74,7 @@ class UserController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        /* 📊 Dashboard Statistics */
+        /* Dashboard Statistics */
         $stats = [
             'totalStudents' => User::where('role', 'student')->count(),
             'activeBorrowers' => Checkout::whereIn('status', ['approved', 'checked_out'])

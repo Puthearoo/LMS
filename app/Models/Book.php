@@ -34,25 +34,25 @@ class Book extends Model
         return $this->hasManyThrough(Fine::class, Checkout::class);
     }
 
-    // Helper method to check availabilit
+    // Check availability
     public function isAvailable()
     {
         return $this->availability_status === 'available';
     }
 
-    // Helper method to check if reserved
+    // Check if book is reserved
     public function isReserved()
     {
         return $this->availability_status === 'reserved';
     }
 
-    // ADD THIS METHOD - Check if book is checked out
+    //  Check if book is checked out
     public function isCheckedOut()
     {
         return $this->availability_status === 'checked_out';
     }
 
-    // You might also want this method to get current active checkout
+    // Current active checkout
     public function currentCheckout()
     {
         return $this->checkouts()
